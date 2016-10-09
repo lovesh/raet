@@ -38,6 +38,7 @@ from . import lotting
 from ioflo.base.consoling import getConsole
 console = getConsole()
 
+
 class Stack(object):
     '''
     RAET protocol base stack object.
@@ -95,8 +96,8 @@ class Stack(object):
 
             self.ha = self.server.ha  # update local host address after open
 
-            console.verbose("Stack '{0}': Opened server at '{1}'\n".format(self.name,
-                                                                           self.ha))
+            console.verbose("Stack '{0}': Opened server at '{1}'\n".
+                            format(self.name, self.ha))
 
         self.rxMsgs = rxMsgs if rxMsgs is not None else deque() # messages received
         self.txMsgs = txMsgs if txMsgs is not None else deque() # messages to transmit
@@ -223,7 +224,18 @@ class Stack(object):
             raise raeting.StackError(emsg)
 
         del self.uidRemotes[uid]
-        del self.nameRemotes[remote.name]
+        if remote.name in self.nameRemotes:
+            del self.nameRemotes[remote.name]
+        else:
+            name = None
+            for name, r in self.nameRemotes.items():
+                if r.uid == uid:
+                    break
+            if name:
+                del self.nameRemotes[name]
+            else:
+                raise Exception("Could not find the remote with uid {} and name"
+                                " {} in nameRemotes".format(uid, remote.name))
 
     def removeAllRemotes(self):
         '''
@@ -509,6 +521,7 @@ class Stack(object):
         '''
         pass
 
+
 class KeepStack(Stack):
     '''
     RAET protocol base stack object with persistance via Keep attribute.
@@ -576,8 +589,8 @@ class KeepStack(Stack):
 
     def moveRemote(self, remote, new, clear=False, dump=False):
         '''
-        Move remote with key remote.uid old to key new uid and replace the odict key index
-        so order is the same.
+        Move remote with key remote.uid old to key new uid and replace the
+        odict key index so order is the same.
         If clear then clear the keep file for remote at old
         If dump then dump the keep file for the remote at new
         '''
@@ -730,4 +743,3 @@ class KeepStack(Stack):
     def clearAllKeeps(self):
         self.clearLocalKeep()
         self.clearRemoteKeeps()
-
