@@ -396,12 +396,15 @@ class RemoteEstate(Estate):
             if rf and not self.validRsid(sid):
                 transaction.nack()
                 self.removeTransaction(index)
-                emsg = ("Stack {0}: Stale correspondent {1} from remote {1} at {2}"
-                            "\n".format(self.stack.name,
+                emsg = ("Stack {0}: Stale correspondent {1} from remote {2} "
+                        "at {3}".format(self.stack.name,
                                         index,
                                         self.name,
                                         self.stack.store.stamp))
                 console.terse(emsg)
+                console.verbose("{0} has last sid {1}".
+                                format(self.name, self.rsid))
+                console.terse("\n")
                 self.stack.incStat('stale_correspondent')
         self.doneTransactions.clear()
 
@@ -432,17 +435,21 @@ class RemoteEstate(Estate):
             rf = index[0]
             sid = index[3]
 
-            if not rf and not self.validSid(sid): # transaction sid newer or equal
+            if not rf and not self.validSid(
+                    sid):  # transaction sid newer or equal
                 if transaction.kind in [TrnsKind.message]:
                     self.saveMessage(transaction)
                 transaction.nack()
                 self.removeTransaction(index)
                 emsg = ("Stack {0}: Stale initiator {1} to remote {2} at {3}"
-                        "\n".format(self.stack.name,
-                                    index,
-                                    self.name,
-                                    self.stack.store.stamp))
+                        .format(self.stack.name,
+                                index,
+                                self.name,
+                                self.stack.store.stamp))
                 console.terse(emsg)
+                console.verbose("{0} has last sid {1}".
+                                format(self.name, self.rsid))
+                console.terse("\n")
                 self.stack.incStat('stale_initiator')
 
     def saveMessage(self, messenger):

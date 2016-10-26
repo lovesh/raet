@@ -2177,8 +2177,11 @@ class Allowent(Correspondent):
             lfqdn = lfqdn.encode('ascii', 'ignore')
         lfqdn = lfqdn.ljust(128, b' ')[:128].rstrip(b' ')
         if fqdn != lfqdn:
-            emsg = "Mismatch of fqdn in initiate stuff\n"
+            emsg = "Mismatch of fqdn in initiate stuff."
             console.terse(emsg)
+            console.verbose(" Local fqdn is {0} and received fqdn is {1}.".
+                            format(lfqdn, fqdn))
+            console.terse("\n")
             #self.stack.incStat('invalid_initiate')
             #self.remove()
             #self.nack(kind=raeting.pcktKinds.reject)

@@ -548,9 +548,10 @@ class RoadStack(stacking.KeepStack):
                         return
 
         else: # not join transaction
+            sha = (packet.data.get('sh', ''), packet.data.get('sp', ''))
             if rsid == 0: # cannot use sid == 0 on nonjoin transaction
                 emsg = ("Stack '{0}'. Invalid Zero sid '{1}' for transaction {2} packet"
-                       " {3}. Dropping...\n".format(self.name, rsid, tk, pk ))
+                       " {3}. Dropping...\n".format(self.name, rsid, tk, pk))
                 console.terse(emsg)
                 self.incStat('invalid_sid')
                 return
@@ -568,9 +569,10 @@ class RoadStack(stacking.KeepStack):
             if remote:
                 if not cf: # packet from remotely initiated transaction
                     if not remote.validRsid(rsid): # invalid rsid
-                        emsg = ("Stack '{0}'. Invalid nonjoin from '{1}'. Invalid sid "
-                                " {2} in packet. Dropping...\n".format(self.name,
-                                                            remote.name, rsid,))
+                        emsg = ("Stack '{0}'. Invalid nonjoin from '{1}'. "
+                                "Invalid sid {2} in packet, old sid is {3}. "
+                                "Dropping...\n".format(self.name, remote.name,
+                                                       rsid, remote.rsid))
                         console.terse(emsg)
                         self.incStat('stale_sid')
                         self.replyStale(packet, remote) # nack stale transaction
